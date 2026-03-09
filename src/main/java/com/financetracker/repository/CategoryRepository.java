@@ -1,0 +1,26 @@
+package com.financetracker.repository;
+
+import com.financetracker.entity.Category;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface CategoryRepository extends JpaRepository<Category, Long> {
+
+    /**
+     * Returns system categories + user's own categories.
+     */
+    @Query("""
+        SELECT c FROM Category c
+        WHERE c.isSystem = true
+           OR c.user.id = :userId
+        ORDER BY c.isSystem DESC, c.name ASC
+        """)
+    List<Category> findAvailableForUser(@Param("userId") Long userId);
+
+    List<Category> findByUserId(Long userId);
+}

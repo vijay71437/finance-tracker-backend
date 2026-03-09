@@ -1,0 +1,132 @@
+# ========================================================
+# Finance Tracker API — Application Configuration
+# ========================================================
+
+spring:
+  application:
+    name: finance-tracker-api
+
+  # ---- DataSource (MySQL with HikariCP Connection Pool) ----
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:finance_tracker}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:12345}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: FinanceTrackerHikariPool
+      minimum-idle: 10
+      maximum-pool-size: 50           # Tune based on DB server capacity
+      idle-timeout: 600000            # 10 minutes
+      connection-timeout: 30000       # 30 seconds
+      max-lifetime: 1800000           # 30 minutes
+      leak-detection-threshold: 60000 # Detect connection leaks after 1 min
+      connection-test-query: SELECT 1
+
+  # ---- JPA / Hibernate ----
+  jpa:
+    hibernate:
+      ddl-auto: none             # Flyway manages schema — never use create/update in prod
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 50             # Batch inserts/updates for performance
+          fetch_size: 100
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+        cache:
+          use_second_level_cache: false
+
+  # ---- Redis Cache ----
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+
+  # ---- Flyway DB Migrations ----
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+    repair-on-migrate: true
+
+  # ---- Jackson ----
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    default-property-inclusion: NON_NULL
+    time-zone: UTC
+
+# ---- Server ----
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html
+    min-response-size: 1024
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+    accept-count: 100
+    max-connections: 8192
+    connection-timeout: 20000
+
+# ---- JWT ----
+app:
+  jwt:
+    secret: "ZmluYW5jZS10cmFja2VyLXNlY3JldC1rZXktMjAyNC1wcm9kdWN0aW9uLXNhZmUta2V5"
+    expiration-ms: 86400000
+    refresh-expiration-ms: 604800000
+
+  # ---- Rate Limiting ----
+  rate-limit:
+    requests-per-minute: ${RATE_LIMIT_RPM:100}
+
+  # ---- Pagination defaults ----
+  pagination:
+    default-page-size: 20
+    max-page-size: 100
+
+# ---- Actuator ----
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# ---- OpenAPI / Swagger ----
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# ---- Logging ----
+logging:
+  level:
+    com.financetracker: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level [%X{traceId}] %logger{36} - %msg%n"
