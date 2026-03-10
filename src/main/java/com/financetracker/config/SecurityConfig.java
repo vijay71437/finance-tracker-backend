@@ -106,7 +106,6 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:3000",
-                "http://localhost:5173",
                 "https://*.financetracker.com" ,
                 "https://aquamarine-taffy-235912.netlify.app"// Replace with actual production domain
         ));
