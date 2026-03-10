@@ -107,7 +107,8 @@ public class SecurityConfig {
         config.setAllowedOriginPatterns(List.of(
                 "http://localhost:3000",
                 "https://*.financetracker.com" ,
-                "https://aquamarine-taffy-235912.netlify.app"// Replace with actual production domain
+                "https://*.netlify.app" ,
+                "https://aquamarine-taffy-235912.netlify.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
