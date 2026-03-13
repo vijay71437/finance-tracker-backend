@@ -108,7 +108,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "https://*.financetracker.com" ,
                 "https://*.netlify.app" ,
-                "https://fintrackerv.netlify.app/login"
+                "https://fintrackerv.netlify.app/"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
